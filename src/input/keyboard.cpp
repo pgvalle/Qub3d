@@ -1,18 +1,23 @@
 #include "keyboard.h"
 
-struct qub3d_keyboard_t
+struct qub3d_keyboard
 {
 	int keys[350];
 	int modifiers;
 };
 
-static struct qub3d_keyboard_t keyboard = { { GLFW_RELEASE }, 0 };
+static qub3d_keyboard keyboard = { { GLFW_RELEASE }, 0 };
 
 // IN HEADER
 
 int qub3d_key(int key)
 {
-	return keyboard.keys[key];
+	const int action = keyboard.keys[key];
+	if (action == GLFW_PRESS)
+	{
+		keyboard.keys[key] = GLFW_REPEAT;
+	}
+	return action;
 }
 
 // CALLBACKS

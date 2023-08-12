@@ -1,6 +1,6 @@
 #include <GLFW/glfw3.h>
 
-struct qub3d_mouse_t
+struct qub3d_mouse
 {
 	int x, y;
 	int last_x, last_y;
@@ -11,7 +11,9 @@ struct qub3d_mouse_t
 	int modifiers;
 };
 
-static struct qub3d_mouse_t mouse = { -1, -1, -1, -1, 0, { GLFW_RELEASE }, 0 };
+static qub3d_mouse mouse = { -1, -1, -1, -1, 0, { GLFW_RELEASE }, 0 };
+
+// IN HEADER
 
 void qub3d_refresh_mouse()
 {
@@ -20,8 +22,6 @@ void qub3d_refresh_mouse()
 	mouse.last_x = mouse.x;
 	mouse.last_y = mouse.y;
 }
-
-// IN HEADER
 
 void qub3d_get_mouse_position(int* x, int* y)
 {
@@ -56,8 +56,8 @@ void qub3d_mouse_position_callback(GLFWwindow* win, double x, double y)
 {
 	mouse.last_x = mouse.x;
 	mouse.last_y = mouse.y;
-	mouse.x = x;
-	mouse.y = y;
+	mouse.x = (int)x;
+	mouse.y = (int)y;
 }
 
 void qub3d_mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
