@@ -7,16 +7,15 @@ namespace qub3d
 	class Camera
 	{
 	private:
-		vec3 position;
-		float yaw, pitch;
-		float sensitivity;
+		vec3 position = { 0, 0, 0 };
+		float yaw = 0, pitch = 0;
+		float sensitivity = 0.5f;
 		mat4x4 view;
 
 	public:
-		Camera()
-			: position{ 0, 0, -1 }, yaw{ -90 }, pitch{ 0 }, sensitivity{ 0.5f }
+		Camera::Camera()
 		{
-			rotate(0, 0);
+			rotate(0, 90); // look in the direction of (0, 0, -1)
 		}
 
 		const vec4* get_view_mat() const
