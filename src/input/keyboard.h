@@ -3,6 +3,9 @@
 
 #include <GLFW/glfw3.h>
 
-int qub3d_key(int key);
+namespace qub3d
+{
+	int get_key(int key);
+}
 
 #endif // QUB3D_KEYBOARD_H

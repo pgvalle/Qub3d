@@ -21,7 +21,7 @@ qub3d_chunk_mesh qub3d_build_chunk_mesh(const qub3d_chunk& chunk)
 	uint32_t* indices = (uint32_t*)malloc(36 * CHUNK_SIZE * sizeof(*indices));
 	size_t len_vertices = 0, len_indices = 0;
 
-	int index_offset = 0;
+	int elem_offset = 0;
 	
 	// for each chunk block, create the block
 	for (int yi = 0; yi < CHUNK_HEIGHT; yi++)
@@ -30,25 +30,26 @@ qub3d_chunk_mesh qub3d_build_chunk_mesh(const qub3d_chunk& chunk)
 		{
 			for (int xi = 0; xi < CHUNK_WIDTH; xi++)
 			{
-				const int i = CHUNK_WIDTH * CHUNK_WIDTH * yi + CHUNK_WIDTH * zi + xi;
-					// for each block face, push vertices of that face and indices to their arrays
-					// bottom
-					vec3 vertices_bot[] = {
-						{ x_off + 0.5f, y_off - 0.5f, z_off + 0.5f },
-						{ x_off - 0.5f, y_off - 0.5f, z_off + 0.5f },
-						{ x_off - 0.5f, y_off - 0.5f, z_off - 0.5f },
-						{ x_off + 0.5f, y_off - 0.5f, z_off - 0.5f }
-					};
-					memcpy(&vertices[len_vertices], vertices_bot, sizeof(vertices_bot));
-					len_vertices += 4;
+				// map to 1D-array
+				//const int i = CHUNK_WIDTH * CHUNK_WIDTH * yi + CHUNK_WIDTH * zi + xi;
 
-					uint32_t indices_bot[] = { 0, 1, 2, 0, 2, 3 };
-					for (int j = 0; j < 6; j++)
-					{
-						indices[len_indices++] = index_offset + indices_bot[j];
-					}
-					index_offset += 4;
+				// for each block face, push vertices of that face and indices to their arrays
+				// bottom
+				vec3 vertices_bot[] = {
+					x_off + 0.5f, y_off - 0.5f, z_off + 0.5f,
+					x_off - 0.5f, y_off - 0.5f, z_off + 0.5f,
+					x_off - 0.5f, y_off - 0.5f, z_off - 0.5f,
+					x_off + 0.5f, y_off - 0.5f, z_off - 0.5f
+				};
+				memcpy(&vertices[len_vertices], vertices_bot, sizeof(vertices_bot));
+				len_vertices += 4;
 
+				uint32_t indices_bot[] = { 0, 1, 2, 0, 2, 3 };
+				for (int j = 0; j < 6; j++)
+				{
+					indices[len_indices++] = indices_bot[j] + elem_offset;
+				}
+				elem_offset += 4;
 
 				x_off += 1;
 			}

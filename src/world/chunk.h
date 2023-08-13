@@ -6,6 +6,7 @@
 
 #define CHUNK_WIDTH  16  // x and z
 #define CHUNK_HEIGHT 256 // y
+
 #define CHUNK_SIZE (CHUNK_WIDTH * CHUNK_WIDTH * CHUNK_HEIGHT)
 
 struct qub3d_chunk
