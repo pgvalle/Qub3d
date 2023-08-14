@@ -1,6 +1,7 @@
 #include <glad.h>
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
+#include <initializer_list>
 
 #include <assert.h>
 #include <stdio.h>
@@ -11,26 +12,12 @@
 #include "input/keyboard.h"
 #include "opengl/shader.h"
 
-// CALLBACK DECLARATIONS (definitions in mouse.cpp and keyboard.cpp)
-
-void resize_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
-
-namespace qub3d
-{
-    void mouse_position_callback(GLFWwindow*, double, double);
-    void mouse_button_callback(GLFWwindow*, int, int, int);
-    void mouse_enter_callback(GLFWwindow*, int);
-    void key_callback(GLFWwindow*, int, int, int, int);
-}
-
-static GLFWwindow* qub3d_window = NULL;
+#include "callbacks.decl"
 
 const char* vert_src = R"SHADER(
 #version 330 core
-layout (location = 0) in vec3 position;
+layout (location = 0) in vec3 pos;
+layout (location = 1) in vec2 uv;
 
 out vec2 uvs;
 
@@ -38,20 +25,25 @@ uniform mat4 proj;
 uniform mat4 view;
 
 void main() {
-    gl_Position = proj * view * vec4(position, 1.0);
+    gl_Position = proj * view * vec4(pos, 1.0);
+    uvs = uv;
 }
 )SHADER";
 
 const char* frag_src = R"SHADER(
 #version 330 core
 
+uniform sampler2D tex;
+
 in  vec2 uvs;
 out vec4 FragColor;
 
 void main() {
-    FragColor = vec4(1, 0.4, 0.8, 1);
+    FragColor = texture(tex, uvs);
 }
 )SHADER";
+
+static GLFWwindow* window = nullptr;
 
 void configure_glfw()
 {
@@ -62,31 +54,35 @@ void configure_glfw()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    qub3d_window = glfwCreateWindow(800, 450, "Qub3d", NULL, NULL);
-    glfwMakeContextCurrent(qub3d_window);
+    window = glfwCreateWindow(800, 450, "Qub3d", nullptr, nullptr);
+    glfwMakeContextCurrent(window);
     assert(gladLoadGL(glfwGetProcAddress));
 
-    glfwSetWindowSizeLimits(qub3d_window, 400, 225, GLFW_DONT_CARE, GLFW_DONT_CARE);
-    glfwSetFramebufferSizeCallback(qub3d_window, resize_callback);
-    glfwSetCursorPosCallback(qub3d_window, qub3d::mouse_position_callback);
-    glfwSetMouseButtonCallback(qub3d_window, qub3d::mouse_button_callback);
-    glfwSetCursorEnterCallback(qub3d_window, qub3d::mouse_enter_callback);
-    glfwSetKeyCallback(qub3d_window, qub3d::key_callback);
+    glfwSetWindowSizeLimits(window, 400, 225, GLFW_DONT_CARE, GLFW_DONT_CARE);
+    glfwSetFramebufferSizeCallback(window, resize_callback);
+    glfwSetCursorPosCallback(window, qub3d::mouse_position_callback);
+    glfwSetMouseButtonCallback(window, qub3d::mouse_button_callback);
+    glfwSetCursorEnterCallback(window, qub3d::mouse_enter_callback);
+    glfwSetKeyCallback(window, qub3d::key_callback);
 
     glfwSwapInterval(1);
 }
+
+using namespace qub3d;
 
 int main()
 {
     configure_glfw();
 
+    glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_CW);
 
-    qub3d_chunk* chunk = qub3d_generate_chunk();
-    qub3d_chunk_mesh mesh = qub3d_build_chunk_mesh(*chunk);
-
-    printf("here\n");
+    BlockModel::generate_base_models();
+    Chunk chunk;
+    chunk.generate();
+    ChunkMesh model;
+    model.build(chunk);
 
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
@@ -96,35 +92,60 @@ int main()
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(*mesh.vertices) * mesh.len_vertices, mesh.vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(*model.vertices) * model.len_vertices, model.vertices, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(*mesh.indices) * mesh.len_indices, mesh.indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(*model.indices) * model.len_indices, model.indices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(BlockVertex), (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(BlockVertex), (void*)(sizeof(vec3)));
+    glEnableVertexAttribArray(1);
 
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    unsigned int texture;
+    // texture 1
+    // ---------
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    stbi_set_flip_vertically_on_load(true);
+    int width, height;
+    unsigned char* data = stbi_load("dirt.png", &width, &height, NULL, 3);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
 
     qub3d::Camera cam;
 
-    GLuint shader = qub3d_build_shader(vert_src, frag_src, "01");
+    GLuint shader = qub3d::build_shader(vert_src, frag_src, "01");
     glUseProgram(shader);
+
+    glUniform1i(glGetUniformLocation(shader, "tex"), 0);
+    glActiveTexture(GL_TEXTURE0);
 
     mat4x4 proj;
     mat4x4_perspective(proj, 45, 1.7778f, 1, 100);
-    qub3d_set_shader_mat4(shader, "view", cam.get_view_mat());
-    qub3d_set_shader_mat4(shader, "proj", proj);
+    qub3d::set_shader_mat4(shader, cam.get_view_mat(), "view");
+    qub3d::set_shader_mat4(shader, proj, "proj");
+ 
 
     int use_camera = 0;
 
-    while (!glfwWindowShouldClose(qub3d_window))
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+    while (!glfwWindowShouldClose(window))
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glDrawElements(GL_TRIANGLES, mesh.len_indices, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, model.len_indices, GL_UNSIGNED_INT, 0);
 
-        glfwSwapBuffers(qub3d_window);
+        glfwSwapBuffers(window);
         glfwPollEvents();
 
         if (use_camera)
@@ -141,18 +162,18 @@ int main()
                 cam.rotate(1.0f * yaw_offset, 1.0f * pitch_offset);
             }
 
-            qub3d_set_shader_mat4(shader, "view", cam.get_view_mat());
+            qub3d::set_shader_mat4(shader, cam.get_view_mat(), "view");
 
             if (qub3d::get_key(GLFW_KEY_ESCAPE) == GLFW_PRESS)
             {
                 use_camera = 0;
-                glfwSetInputMode(qub3d_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             }
         }
         else if (qub3d::get_key(GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
             use_camera = 1;
-            glfwSetInputMode(qub3d_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
 
         qub3d::refresh_mouse();
@@ -163,7 +184,7 @@ int main()
     glDeleteBuffers(1, &EBO);
     glDeleteProgram(shader);
 
-    glfwDestroyWindow(qub3d_window);
+    glfwDestroyWindow(window);
     glfwTerminate();
 
     return 0;

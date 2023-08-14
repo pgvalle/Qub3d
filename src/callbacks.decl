@@ -1,0 +1,16 @@
+#include <GLFW/glfw3.h>
+
+// CALLBACK DECLARATIONS (definitions in mouse.cpp and keyboard.cpp)
+
+void resize_callback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+}
+
+namespace qub3d
+{
+    void mouse_position_callback(GLFWwindow*, double, double);
+    void mouse_button_callback(GLFWwindow*, int, int, int);
+    void mouse_enter_callback(GLFWwindow*, int);
+    void key_callback(GLFWwindow*, int, int, int, int);
+}

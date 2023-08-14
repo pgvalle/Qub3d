@@ -1,7 +1,5 @@
 #include "camera.h"
-#include <assert.h>
-#include <math.h>
-#include <stdio.h>
+#include <cmath>
 
 static const vec3 UP = { 0, 1, 0 };
 

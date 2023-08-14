@@ -15,7 +15,7 @@ namespace qub3d
 	public:
 		Camera::Camera()
 		{
-			rotate(0, 90); // look in the direction of (0, 0, -1)
+			rotate(0, 0); // look in the direction of (1, 0, 0)
 		}
 
 		const vec4* get_view_mat() const
