@@ -14,4 +14,3 @@ namespace qub3d
 
 	bool is_mouse_moving();
 }
-

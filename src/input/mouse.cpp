@@ -68,5 +68,3 @@ namespace qub3d
 		inside = (bool)entered;
 	}
 }
-
-
