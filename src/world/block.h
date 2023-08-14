@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 #include <linmath.h>
 
 namespace qub3d
@@ -24,12 +25,16 @@ namespace qub3d
 
 	struct BlockModel
 	{
-		BlockVertex* vertices = nullptr;
-		size_t len_vertices = 0;
+		std::vector<BlockVertex> vertices;
+		std::vector<uint32_t> indices;
 
-		uint32_t* indices = nullptr;
-		size_t len_indices = 0;
-
+		// any faces in any possible model consist of 4 vertices
+		// so size of vertices and indices is multiple of 4
+		int face_count() const
+		{
+			return vertices.size() / 4;
+		}
+		
 		static void generate_base_models();
 		// Returns a copy of the original model.
 		static BlockModel get_base_model(BlockId id);

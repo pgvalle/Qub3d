@@ -1,17 +1,15 @@
 #include "block.h"
 #include <map>
 #include <cstdlib>
-#include <cassert>
+
 namespace qub3d
 {
-	static std::map<BlockId, BlockModel> base_models = std::map<BlockId, BlockModel>();
+	static std::map<BlockId, BlockModel> base_models;
 
 	// each model generation function (REEEEEEEEALLY long section)
 	void generate_dirt_model()
 	{
 		BlockModel model;
-		model.vertices = (BlockVertex*)malloc(24 * sizeof(*model.vertices));
-		model.indices = (uint32_t*)malloc(36 * sizeof(*model.indices));
 
 		const vec3 positions[8] = {
 			 0.5f, -0.5f,  0.5f,
@@ -36,7 +34,7 @@ namespace qub3d
 			0, 4, 7, 1  // front
 		};
 
-		int indices_offset = 0;
+		uint32_t indices_offset = 0;
 
 		// for each face
 		for (int f = 0; f < 6; f++)
@@ -50,16 +48,21 @@ namespace qub3d
 				BlockVertex vertex;
 				memcpy(vertex.position, positions[face_index], sizeof(vec3));
 				memcpy(vertex.uv, uvs[i], sizeof(vec2));
-				memcpy(&model.vertices[model.len_vertices++], &vertex, sizeof(vertex));
+				
+				model.vertices.push_back(vertex);
 			}
 
 			// append indices to mesh correctly so that opengl can render the face
-			for (int i : { 0, 1, 2, 2, 3, 0 })
+			for (uint32_t i : { 0, 1, 2, 2, 3, 0 })
 			{
-				model.indices[model.len_indices++] = i + indices_offset;
+				model.indices.push_back(i + indices_offset);
 			}
 			indices_offset += 4;
 		}
+
+		// don't waste memory
+		model.vertices.shrink_to_fit();
+		model.indices.shrink_to_fit();
 
 		base_models[BlockId::DIRT] = model;
 	}
@@ -72,34 +75,22 @@ namespace qub3d
 
 	BlockModel BlockModel::get_base_model(BlockId id)
 	{
-		const BlockModel base = base_models[id];
-		BlockModel copy;
-
-		copy.vertices = (BlockVertex*)malloc(base.len_vertices * sizeof(*copy.vertices));
-		copy.indices = (uint32_t*)malloc(base.len_indices * sizeof(*copy.indices));
-
-		// deep copy everything
-		memcpy(copy.vertices, base.vertices, base.len_vertices * sizeof(*copy.vertices));
-		copy.len_vertices = base.len_vertices;
-		memcpy(copy.indices, base.indices, base.len_indices * sizeof(*copy.indices));
-		copy.len_indices = base.len_indices;
-
-		return copy;
+		return base_models.at(id);
 	}
 
 	void BlockModel::translate(float x_off, float y_off, float z_off, uint32_t index_off)
 	{
 		// translating vertices
 		const vec3 offset = { x_off, y_off, z_off };
-		for (int i = 0; i < len_vertices; i++)
+		for (BlockVertex& vertex : vertices)
 		{
-			vec3_add(vertices[i].position, vertices[i].position, offset);
+			vec3_add(vertex.position, vertex.position, offset);
 		}
 
 		// translating indices
-		for (int i = 0; i < len_indices; i++)
+		for (uint32_t& index : indices)
 		{
-			indices[i] += index_off;
+			index += index_off;
 		}
 	}
 }
