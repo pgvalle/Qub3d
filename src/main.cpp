@@ -54,7 +54,7 @@ void configure_glfw()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(800, 450, "Qub3d", nullptr, nullptr);
+    window = glfwCreateWindow(1280, 720, "Qub3d", nullptr, nullptr);
     glfwMakeContextCurrent(window);
     assert(gladLoadGL(glfwGetProcAddress));
 

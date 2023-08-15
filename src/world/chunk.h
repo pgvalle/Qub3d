@@ -18,9 +18,13 @@ namespace qub3d
     struct ChunkMesh
     {
         std::vector<Vertex> vertices;
-        std::vector<uint32_t> indices;
-        // index_lookup[i] points to where the first index of block[i] is in indices vector
+        // vertex_lookup[i] points to where the first vertex of block[i] is in vertex vector
         // really important for world editing
+        std::vector<uint32_t> vertex_lookup;
+
+        std::vector<uint32_t> indices;
+        // index_lookup[i] points to where the first index of block[i] is in index vector
+        // also important for world editing
         std::vector<uint32_t> index_lookup;
 
         const Vertex* vertex_data() const

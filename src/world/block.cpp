@@ -1,4 +1,5 @@
 #include "block.h"
+#include <cstdlib>
 
 namespace qub3d
 {
@@ -13,7 +14,7 @@ namespace qub3d
       6. back
     */
 
-    const Vertex* get_block_default_mesh(BlockId id)
+    Vertex* get_block_default_mesh(BlockId id)
     {
         static Vertex mesh[24] = {
              // right
@@ -53,6 +54,9 @@ namespace qub3d
              0.5f, -0.5f, -0.5f,   1, 0,
         };
 
-        return mesh;
+        Vertex* copy = (Vertex*)malloc(sizeof(mesh));
+        memcpy(copy, mesh, sizeof(mesh));
+
+        return copy;
     }
 }

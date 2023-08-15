@@ -25,5 +25,5 @@ namespace qub3d
       5. bottom
       6. back
     */
-    const Vertex* get_block_default_mesh(BlockId id);
+    Vertex* get_block_default_mesh(BlockId id);
 }

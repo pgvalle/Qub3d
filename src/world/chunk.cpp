@@ -5,11 +5,18 @@
 namespace qub3d
 {
     const int CHUNK_WIDTH  = 16;
-    const int CHUNK_HEIGHT = 256;
+    const int CHUNK_HEIGHT = 16;
     const int CHUNK_DEPTH  = 16;
     const int CHUNK_SIZE   = CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH;
 
     // USEFUL FUNCTIONS
+
+    static void get_xyz_indices(int i, int& xi_ref, int& yi_ref, int& zi_ref)
+    {
+        xi_ref = i % CHUNK_WIDTH;
+        yi_ref = i / (CHUNK_WIDTH * CHUNK_DEPTH);
+        zi_ref = (i / CHUNK_WIDTH) % CHUNK_DEPTH;
+    }
 
     static int get_array_index(int xi, int yi, int zi)
     {
@@ -78,89 +85,99 @@ namespace qub3d
     void ChunkMesh::build(Chunk chunk)
     {
         const uint32_t face_indices_default[] = { 0, 1, 2, 2, 3, 0 };
-        uint32_t indices_off = 0;
+        uint32_t indices_offset = 0;
 
-        for (int yi = 0; yi < CHUNK_HEIGHT; yi++)
+        // for each block in chunk
+        for (int i = 0; i < CHUNK_SIZE; i++)
         {
-            for (int zi = 0; zi < CHUNK_DEPTH; zi++)
+            // update lookup arrays
+            vertex_lookup.push_back(vertices.size());
+            index_lookup.push_back(indices.size());
+
+            // get block model preset
+            const BlockId block_id = chunk.blocks[i];
+            Vertex* default_block_mesh = get_block_default_mesh(block_id);
+
+            int xi, yi, zi;
+            get_xyz_indices(i, xi, yi, zi);
+            // translation vector for block[i] to put it in the right place in the world
+            const vec3 offset = { xi, yi, zi };
+            // translate block preset to be put in the right place
+            for (int j = 0; j < 24; j++)
             {
-                for (int xi = 0; xi < CHUNK_WIDTH; xi++)
-                {
-                    const int i = get_array_index(xi, yi, zi);
-                    const BlockId block = chunk.blocks[i];
-                    const Vertex* mesh = get_block_default_mesh(block);
-
-                    for (int j = 0; j < 24; j++)
-                    {
-                        vertices.push_back(mesh[j]);
-                        Vertex& vertex = vertices.back();
-                        const vec3 offset = { xi, yi, zi };
-                        vec3_add(vertex.position, vertex.position, offset);
-                    }
-
-                    // block[i] indices are located in position indices_off inside indices array.
-                    index_lookup.push_back(indices_off);
-
-                    // 1. air block surroudings check
-
-                    if (no_block_right(chunk, xi, yi, zi))
-                    {
-                        for (uint32_t index : face_indices_default)
-                        {
-                            indices.push_back(index + indices_off);
-                        }
-                    }
-                    indices_off += 4;
-
-                    if (no_block_top(chunk, xi, yi, zi))
-                    {
-                        for (uint32_t index : face_indices_default)
-                        {
-                            indices.push_back(index + indices_off);
-                        }
-                    }
-                    indices_off += 4;
-
-                    if (no_block_front(chunk, xi, yi, zi))
-                    {
-                        for (uint32_t index : face_indices_default)
-                        {
-                            indices.push_back(index + indices_off);
-                        }
-                    }
-                    indices_off += 4;
-
-                    if (no_block_left(chunk, xi, yi, zi))
-                    {
-                        for (uint32_t index : face_indices_default)
-                        {
-                            indices.push_back(index + indices_off);
-                        }
-                    }
-                    indices_off += 4;
-
-                    if (no_block_bottom(chunk, xi, yi, zi))
-                    {
-                        for (uint32_t index : face_indices_default)
-                        {
-                            indices.push_back(index + indices_off);
-                        }
-                    }
-                    indices_off += 4;
-
-                    if (no_block_back(chunk, xi, yi, zi))
-                    {
-                        for (uint32_t index : face_indices_default)
-                        {
-                            indices.push_back(index + indices_off);
-                        }
-                    }
-                    indices_off += 4;
-
-                    // 2. know which faces not to include
-                    // 3. add incices corresponding to faces that should be included
-                }
+                float* position = default_block_mesh[j].position;
+                vec3_add(position, position, offset);
             }
+
+            int j = 0; // how many vertices of block should be placed in the chunk
+
+            if (no_block_right(chunk, xi, yi, zi))
+            {
+                for (int k = j; k < j + 4; k++)
+                    vertices.push_back(default_block_mesh[k]);
+
+                for (uint32_t index : face_indices_default)
+                    indices.push_back(index + indices_offset);
+                indices_offset += 4;
+            }
+            j += 4;
+
+            if (no_block_top(chunk, xi, yi, zi))
+            {
+                for (int k = j; k < j + 4; k++)
+                    vertices.push_back(default_block_mesh[k]);
+
+                for (uint32_t index : face_indices_default)
+                    indices.push_back(index + indices_offset);
+                indices_offset += 4;
+            }
+            j += 4;
+
+            if (no_block_front(chunk, xi, yi, zi))
+            {
+                for (int k = j; k < j + 4; k++)
+                    vertices.push_back(default_block_mesh[k]);
+
+                for (uint32_t index : face_indices_default)
+                    indices.push_back(index + indices_offset);
+                indices_offset += 4;
+            }
+            j += 4;
+
+            if (no_block_left(chunk, xi, yi, zi))
+            {
+                for (int k = j; k < j + 4; k++)
+                    vertices.push_back(default_block_mesh[k]);
+
+                for (uint32_t index : face_indices_default)
+                    indices.push_back(index + indices_offset);
+                indices_offset += 4;
+            }
+            j += 4;
+
+            if (no_block_bottom(chunk, xi, yi, zi))
+            {
+                for (int k = j; k < j + 4; k++)
+                    vertices.push_back(default_block_mesh[k]);
+
+                for (uint32_t index : face_indices_default)
+                    indices.push_back(index + indices_offset);
+                indices_offset += 4;
+            }
+            j += 4;
+
+            if (no_block_back(chunk, xi, yi, zi))
+            {
+                for (int k = j; k < j + 4; k++)
+                    vertices.push_back(default_block_mesh[k]);
+
+                for (uint32_t index : face_indices_default)
+                    indices.push_back(index + indices_offset);
+                indices_offset += 4;
+            }
+            
+            free(default_block_mesh);
         }
     }
+
 }
