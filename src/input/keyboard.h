@@ -4,5 +4,5 @@
 
 namespace qub3d
 {
-	int get_key(int key);
+    int get_key(int key);
 }

@@ -78,7 +78,6 @@ int main()
     glEnable(GL_CULL_FACE);
     glCullFace(GL_CW);
 
-    BlockModel::generate_base_models();
     Chunk chunk;
     chunk.generate();
     ChunkMesh model;
@@ -92,14 +91,14 @@ int main()
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(*model.vertices) * model.len_vertices, model.vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, model.vertex_buffer_size(), model.vertex_data(), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(*model.indices) * model.len_indices, model.indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, model.index_buffer_size(), model.index_data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(BlockVertex), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(BlockVertex), (void*)(sizeof(vec3)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(vec3)));
     glEnableVertexAttribArray(1);
 
     unsigned int texture;
@@ -117,6 +116,7 @@ int main()
     stbi_set_flip_vertically_on_load(true);
     int width, height;
     unsigned char* data = stbi_load("dirt.png", &width, &height, NULL, 3);
+    assert(data);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
@@ -143,7 +143,7 @@ int main()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glDrawElements(GL_TRIANGLES, model.len_indices, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, model.indices.size(), GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
