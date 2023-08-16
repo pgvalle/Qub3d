@@ -4,11 +4,6 @@
 
 namespace qub3d
 {
-    const int CHUNK_WIDTH  = 16;
-    const int CHUNK_HEIGHT = 16;
-    const int CHUNK_DEPTH  = 16;
-    const int CHUNK_SIZE   = CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH;
-
     // USEFUL FUNCTIONS
 
     static void get_xyz_indices(int i, int& xi_ref, int& yi_ref, int& zi_ref)
@@ -90,9 +85,9 @@ namespace qub3d
         // for each block in chunk
         for (int i = 0; i < CHUNK_SIZE; i++)
         {
-            // update lookup arrays
-            vertex_lookup.push_back(vertices.size());
-            index_lookup.push_back(indices.size());
+            // update lookup arrays for block[i]
+            vertex_lookup[i] = vertices.size();
+            index_lookup[i] = indices.size();
 
             // get block model preset
             const BlockId block_id = chunk.blocks[i];
@@ -180,4 +175,75 @@ namespace qub3d
         }
     }
 
+    void ChunkMesh::remove(Chunk chunk)
+    {
+        const int i = 0;
+        int xi, yi, zi;
+        get_xyz_indices(i, xi, yi, zi);
+
+        // figure out how many faces are gonna be added
+        // and how many faces are being deleted
+
+        const int num_of_vertices = vertex_lookup[i + 1] - vertex_lookup[i];
+        vertices.erase(vertices.begin() + vertex_lookup[i], vertices.begin() + vertex_lookup[i + 1]);
+
+        const int num_of_indices = index_lookup[i + 1] - index_lookup[i];
+        indices.erase(indices.begin() + index_lookup[i], indices.begin() + index_lookup[i + 1]);
+
+        for (int j = index_lookup[i]; j < indices.size(); j++)
+        {
+            indices[j] -= num_of_vertices;
+        }
+
+        // update lookups
+        for (int j = i + 1; j < CHUNK_SIZE; j++)
+        {
+            vertex_lookup[j] -= num_of_vertices;
+            index_lookup[j] -= num_of_indices;
+        }
+
+        // set block i
+        chunk.blocks[i] = 0;
+
+        // add faces
+
+        if (!no_block_bottom(chunk, xi, yi, zi))
+        {
+            // add top face of block below
+        }
+
+        // add front face of back block
+        if (!no_block_back(chunk, xi, yi, zi))
+        {
+            
+        }
+
+        if (!no_block_left(chunk, xi, yi, zi))
+        {
+            // add right face of block to the left
+        }
+
+        if (!no_block_right(chunk, xi, yi, zi))
+        {
+            // add left face of block to the right
+        }
+
+        if (!no_block_front(chunk, xi, yi, zi))
+        {
+            // add back face of front block
+        }
+
+        if (!no_block_top(chunk, xi, yi, zi))
+        {
+            // add bottom face of top block
+        }
+
+
+        // is there a block right?
+        // is there a block above?
+        // is there a block front?
+        // is there a block left?
+        // is there a block down?
+        // is there a block below?
+    }
 }
