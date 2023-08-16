@@ -177,7 +177,7 @@ namespace qub3d
 
     void ChunkMesh::remove(Chunk chunk)
     {
-        const int i = 0;
+        const int i = 12;
         int xi, yi, zi;
         get_xyz_indices(i, xi, yi, zi);
 
@@ -215,17 +215,87 @@ namespace qub3d
         // add front face of back block
         if (!no_block_back(chunk, xi, yi, zi))
         {
-            
+            // get block model preset
+            const int j = get_array_index(xi, yi, zi - 1);
+            const BlockId block_id = chunk.blocks[j];
+            Vertex* default_block_mesh = get_block_default_mesh(block_id);
+            // translation vector for block[j] to put it in the right place in the world
+            const vec3 offset = { xi, yi, zi };
+
+            // go to lookups of block[j] and offset to know exatcly where to put the vertices and indices
+            const int first_vertex = vertex_lookup[j] + 8;
+            // translating face and adding all their vertices to mesh
+            for (int k = 8; k < 12; k++)
+            {
+                float* position = default_block_mesh[k].position;
+                vec3_add(position, position, offset);
+                
+                vertices.insert(vertices.begin() + first_vertex, default_block_mesh[k]);
+            }
+
+            const int first_index = index_lookup[j] + 12;
+            // adding indices to mesh
+            indices.insert(indices.begin() + first_index,
+                indices.begin() + first_index, indices.begin() + first_index + 6);
+
+            // update indices after the new ones inserted
+            for (int k = first_index + 6; k < indices.size(); k++)
+                indices[k] += 4;
+
+            // update lookups
+            for (int k = j + 1; k < CHUNK_SIZE; k++)
+            {
+                vertex_lookup[k] += 4;
+                index_lookup[k] += 6;
+            }
+
+            free(default_block_mesh);
         }
 
+        // add right face of block to the left
         if (!no_block_left(chunk, xi, yi, zi))
         {
-            // add right face of block to the left
+            // get block model preset
+            const int j = get_array_index(xi - 1, yi, zi);
+            const BlockId block_id = chunk.blocks[j];
+            Vertex* default_block_mesh = get_block_default_mesh(block_id);
+            // translation vector for block[j] to put it in the right place in the world
+            const vec3 offset = { xi, yi, zi };
+
+            // go to lookups of block[j] and offset to know exatcly where to put the vertices and indices
+            const int first_vertex = vertex_lookup[j];
+            // translating face and adding all their vertices to mesh
+            for (int k = 0; k < 4; k++)
+            {
+                float* position = default_block_mesh[k].position;
+                vec3_add(position, position, offset);
+
+                vertices.insert(vertices.begin() + first_vertex, default_block_mesh[k]);
+            }
+
+            const int first_index = index_lookup[j];
+            // adding indices to mesh
+            indices.insert(indices.begin() + first_index,
+                indices.begin() + first_index, indices.begin() + first_index + 6);
+
+            // update indices after the new ones inserted
+            for (int k = first_index + 6; k < indices.size(); k++)
+                indices[k] += 4;
+
+            // update lookups
+            for (int k = j + 1; k < CHUNK_SIZE; k++)
+            {
+                vertex_lookup[k] += 4;
+                index_lookup[k] += 6;
+            }
+
+            free(default_block_mesh);
         }
 
+        // add left face of block to the right
         if (!no_block_right(chunk, xi, yi, zi))
         {
-            // add left face of block to the right
+
         }
 
         if (!no_block_front(chunk, xi, yi, zi))

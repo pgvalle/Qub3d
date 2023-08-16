@@ -9,9 +9,9 @@
 
 namespace qub3d
 {
-    const int CHUNK_WIDTH  = 16;
-    const int CHUNK_HEIGHT = 256;
-    const int CHUNK_DEPTH  = 16;
+    const int CHUNK_WIDTH  = 8;
+    const int CHUNK_HEIGHT = 8;
+    const int CHUNK_DEPTH  = 8;
     const int CHUNK_SIZE   = CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH;
 
     struct Chunk
