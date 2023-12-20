@@ -12,8 +12,6 @@
 #include "input/keyboard.h"
 #include "opengl/shader.h"
 
-#include "callbacks.decl"
-
 const char* vert_src = R"SHADER(
 #version 330 core
 layout (location = 0) in vec3 pos;
@@ -60,10 +58,10 @@ void configure_glfw()
 
     glfwSetWindowSizeLimits(window, 400, 225, GLFW_DONT_CARE, GLFW_DONT_CARE);
     glfwSetFramebufferSizeCallback(window, resize_callback);
-    glfwSetCursorPosCallback(window, qub3d::mouse_position_callback);
-    glfwSetMouseButtonCallback(window, qub3d::mouse_button_callback);
-    glfwSetCursorEnterCallback(window, qub3d::mouse_enter_callback);
-    glfwSetKeyCallback(window, qub3d::key_callback);
+    glfwSetCursorPosCallback(window, Mouse::pos_callback);
+    glfwSetMouseButtonCallback(window, Mouse::button_callback);
+    glfwSetCursorEnterCallback(window, Mouse::enter_callback);
+    glfwSetKeyCallback(window, Keyboard::key_callback);
 
     glfwSwapInterval(1);
 }
@@ -121,7 +119,7 @@ int main()
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
 
-    qub3d::Camera cam;
+    Camera cam;
 
     GLuint shader = qub3d::build_shader(vert_src, frag_src, "01");
     glUseProgram(shader);
@@ -131,7 +129,7 @@ int main()
 
     mat4x4 proj;
     mat4x4_perspective(proj, 45, 1.7778f, 1, 100);
-    qub3d::set_shader_mat4(shader, cam.get_view_mat(), "view");
+    qub3d::set_shader_mat4(shader, cam.view_mat(), "view");
     qub3d::set_shader_mat4(shader, proj, "proj");
  
 
@@ -150,33 +148,33 @@ int main()
 
         if (use_camera)
         {
-            int xvel = qub3d::get_key(GLFW_KEY_W) - qub3d::get_key(GLFW_KEY_S);
-            int yvel = qub3d::get_key(GLFW_KEY_SPACE) - qub3d::get_key(GLFW_KEY_LEFT_SHIFT);
-            int zvel = qub3d::get_key(GLFW_KEY_D) - qub3d::get_key(GLFW_KEY_A);
+            int xvel = Keyboard::key(GLFW_KEY_W) - Keyboard::key(GLFW_KEY_S);
+            int yvel = Keyboard::key(GLFW_KEY_SPACE) - Keyboard::key(GLFW_KEY_LEFT_SHIFT);
+            int zvel = Keyboard::key(GLFW_KEY_D) - Keyboard::key(GLFW_KEY_A);
             cam.move(0.1f * xvel, 0.1f * yvel, 0.1f * zvel);
 
-            if (qub3d::is_mouse_moving())
+            if (Mouse::moving())
             {
                 int yaw_offset, pitch_offset;
-                qub3d::get_mouse_offset(yaw_offset, pitch_offset);
+                Mouse::offset(yaw_offset, pitch_offset);
                 cam.rotate(1.0f * yaw_offset, 1.0f * pitch_offset);
             }
 
-            qub3d::set_shader_mat4(shader, cam.get_view_mat(), "view");
+            qub3d::set_shader_mat4(shader, cam.view_mat(), "view");
 
-            if (qub3d::get_key(GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            if (Keyboard::key(GLFW_KEY_ESCAPE) == GLFW_PRESS)
             {
                 use_camera = 0;
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             }
         }
-        else if (qub3d::get_key(GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        else if (Keyboard::key(GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
             use_camera = 1;
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
 
-        qub3d::refresh_mouse();
+        Mouse::refresh();
     }
 
     glDeleteVertexArrays(1, &VAO);
