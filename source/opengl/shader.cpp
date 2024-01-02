@@ -110,7 +110,7 @@ void Shader::build_from_files(const char* vertpath, const char* fragpath) {
 }
 
 
-void Shader::set_mat4(const mat4x4 mat, const char* name) {
+void Shader::set_mat4(const glm::mat4& mat, const char* name) {
   const GLint location = glGetUniformLocation(ID, name);
   glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]);
 }

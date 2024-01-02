@@ -1,10 +1,10 @@
 #include "Internal.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 
 void framebuffer_size_callback(GLFWwindow* win, int w, int h) {
-  // TODO: Integrate me with glm!
   // correct perspective matrix aspect ratio
-  mat4x4_perspective(app.proj, 45, (float)w / h, 1, 100);
+  app.proj = glm::perspectiveFov(45.0f, 800.0f, 450.0f, 1.0f, 100.0f);
   // upload it to shader in use
   const GLint location = glGetUniformLocation(app.shader.ID, "proj");
   glUniformMatrix4fv(location, 1, GL_FALSE, &app.proj[0][0]);

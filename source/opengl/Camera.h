@@ -13,7 +13,7 @@ private:
 public:
   Camera();
 
-  const glm::mat4* view_mat() const;
+  const glm::mat4& view_mat() const;
 
   void rotate(float yawoff, float pitchoff);
   // x and z in camera space.

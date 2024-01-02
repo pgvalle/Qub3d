@@ -7,6 +7,7 @@
 
 #include <glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/mat4x4.hpp>
 
 #include "./input/Input.h"
 #include "opengl/Camera.h"
@@ -21,7 +22,7 @@ extern struct AppData {
 
   // graphics
 
-  mat4x4 proj;
+  glm::mat4 proj;
   Camera cam;
   Shader shader;
 

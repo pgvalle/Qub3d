@@ -21,7 +21,7 @@ int count_pngs(const char* path) {
 
 uint32_t* gen_fallback_texture(int dim) {
   uint32_t* fallback = new uint32_t[dim * dim];
-  uint32_t color = 0xfff800f8; // purple
+  uint32_t color = 0xff000000; // black (0xf800f8 is purple)
   for (int i = 0; i < dim; i++) {
     if (i != dim >> 1) {
       color = (color == 0xff000000 ? 0xfff800f8 : 0xff000000);
@@ -37,9 +37,7 @@ uint32_t* gen_fallback_texture(int dim) {
 }
 
 void load_and_pack_textures() {
-  stbi_set_flip_vertically_on_load(true);
-
-  const char* path = "../../../assets/textures";
+  const char* path = "../../assets/textures";
   const int img_dim = 16;
 
   const int imgs = count_pngs(path) + 1; // consider fallback texture as well
@@ -103,9 +101,11 @@ void load_and_pack_textures() {
   glBindTexture(GL_TEXTURE_2D, app.blocks_atlas_id);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, h, w, 0, GL_RGBA, GL_UNSIGNED_BYTE, atlas);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, atlas);
   glGenerateMipmap(GL_TEXTURE_2D);
   app.shader.set_tex_slot(0, "tex");
+
+  //stbi_write_png("../../img.png", w, h, 4, atlas, channels * w);
 
   delete[] atlas;
 }

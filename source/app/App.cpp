@@ -1,4 +1,5 @@
 #include "Internal.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 
 AppData app;
@@ -27,15 +28,13 @@ void initialize() {
   assert(gladLoadGL(glfwGetProcAddress));
 
   // shader setup
-  app.shader.build_from_files("../../../assets/shaders/vert.glsl", "../../../assets/shaders/frag.glsl");
+  app.shader.build_from_files("../../assets/shaders/vert.glsl", "../../assets/shaders/frag.glsl");
   glUseProgram(app.shader.ID);
 
   glfwSetInputMode(app.win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-  // TODO: integrate me with glm!
   // camera setup
-  app.cam.rotate(-180, 0);
-  mat4x4_perspective(app.proj, 45, 800 / 480.f, 1, 100);
+  app.cam.rotate(0, 0);
+  app.proj = glm::perspectiveFov(45.0f, 800.0f, 450.0f, 1.0f, 100.0f);
   app.shader.set_mat4(app.cam.view_mat(), "view");
   app.shader.set_mat4(app.proj, "proj");
   glEnable(GL_DEPTH_TEST);
@@ -50,10 +49,10 @@ void render();
 void run() {
   // quad to render
   Vertex vertices[] = {
-    { {  0.5f,  0.5f, 0.5f },  { 1, 1 } },
-    { { -0.5f,  0.5f, 0.5f },  { 0, 1 } },
-    { { -0.5f, -0.5f, 0.5f },  { 1, 1 } },
-    { {  0.5f, -0.5f, 0.5f },  { 0, 1 } }
+    { {  0.5f,  0.5f, 0.5f },  { 0.099999f, 0.2f - 0.033333f } },
+    { { -0.5f,  0.5f, 0.5f },  { 0.066666f, 0.2f - 0.033333f } },
+    { { -0.5f, -0.5f, 0.5f },  { 0.066666f, 0.2f } },
+    { {  0.5f, -0.5f, 0.5f },  { 0.099999f, 0.2f } }
   };
   GLuint indices[] = {
     0, 1, 2,
@@ -68,9 +67,9 @@ void run() {
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
   // dizendo que o array de vertices tem a posicao do vertice no mundo
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3*sizeof(float)));
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec3)));
   glEnableVertexAttribArray(1);
 
   glClearColor(0, 0, 0, 1);
@@ -119,8 +118,8 @@ void update() {
 
   if (app.mouse.is_moving()) {
     int dx, dy;
-  app.mouse.get_offset(&dx, &dy);
-  app.cam.rotate(2*dx, 2*dy);
+    app.mouse.get_offset(&dx, &dy);
+    app.cam.rotate(2*dx, 2*dy);
   }
   
   
