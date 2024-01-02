@@ -3,8 +3,16 @@
 #include <glad.h>
 #include <linmath.h>
 
-namespace qub3d
-{
-    GLuint build_shader(const char* vert_src, const char* frag_src, const char* name);
-    void set_shader_mat4(GLuint shader, const mat4x4 mat, const char* name);
-}
+struct Shader {
+  GLuint ID; // read-only. Should not be changed.
+
+  Shader(); // default constructor
+  Shader(const char* vertsrc, const char* fragsrc);
+  ~Shader();
+
+  void build(const char* vertsrc, const char* fragsrc);
+  void build_from_files(const char* vertpath, const char* fragpath);
+
+  void set_mat4(const mat4x4 mat, const char* name);
+  void set_tex_slot(GLuint slot, const char* name);
+};
