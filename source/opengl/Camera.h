@@ -5,20 +5,17 @@
 
 class Camera {
 private:
-  glm::vec3 pos;
+  static const float MAX_ABS_PITCH = 89.99f;
+
+  glm::vec3 position;
   glm::mat4 view;
   float yaw, pitch;
-  float sensitivity;
 
 public:
   Camera();
 
-  const glm::mat4& view_mat() const;
+  const glm::mat4& getViewMatrix() const;
 
-  void rotate(float yawoff, float pitchoff);
-  // x and z in camera space.
-  // x: forward(+) or back(-)
-  // y: up(+) or down(-)
-  // z: right(+) or left(-)
-  void move(float xvel, float yvel, float zvel);
+  void rotate(float yawOff, float pitchOff);
+  void move(float xVel, float yVel, float zVel);
 };

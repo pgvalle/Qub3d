@@ -1,14 +1,7 @@
-void initialize();
-void run();
-void terminatei();
-
-#include <cassert>
-#include <cstdio>
-#include "opengl/Vertex.h"
+#include "App.h"
 
 int main(int argc, char** argv) {
-  initialize();
-  run();
-  terminatei();
+  // this looks weird ik but i kinda like it lol
+  delete new App();
   return 0;
 }

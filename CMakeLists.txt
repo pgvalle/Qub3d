@@ -22,9 +22,9 @@ target_include_directories(qub3d PRIVATE source/ external/)
 include(FetchContent)
 
 FetchContent_Declare(
-	glfw
-	GIT_REPOSITORY https://github.com/glfw/glfw
-	GIT_TAG 3.3.9
+  glfw
+  GIT_REPOSITORY https://github.com/glfw/glfw
+  GIT_TAG 3.3.9
 )
 
 set(BUILD_SHARED_LIBS   OFF)
@@ -40,12 +40,19 @@ target_link_libraries(qub3d PRIVATE glfw)
 # GLM setup
 
 FetchContent_Declare(
-	glm
-	GIT_REPOSITORY https://github.com/g-truc/glm
-	GIT_TAG 0.9.9.8
+  glm
+  GIT_REPOSITORY https://github.com/g-truc/glm
+  GIT_TAG 0.9.9.8
 )
 FetchContent_MakeAvailable(glm)
 
 add_dependencies(qub3d glm)
 target_include_directories(qub3d PRIVATE glm)
 target_link_libraries(qub3d PRIVATE glm)
+
+#target_precompile_headers(qub3d PRIVATE
+  # standard library
+  #<cstdio>
+  #<cstdlib>
+  #<string>
+#)
