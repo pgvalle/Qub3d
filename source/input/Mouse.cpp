@@ -1,5 +1,5 @@
-#include "Mouse.h"
 #include "App.h"
+#include "Mouse.h"
 
 #include <cstring>
 

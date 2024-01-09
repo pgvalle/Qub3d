@@ -1,5 +1,5 @@
-#include "Keyboard.h"
 #include "App.h"
+#include "Keyboard.h"
 
 #include <cstring>
 
@@ -14,4 +14,8 @@ Keyboard::Keyboard(GLFWwindow* window) {
     k.keys[key] = action;
     k.mods = mods;
   });
+}
+
+int Keyboard::getKey(int key) {
+  return keys[key];
 }

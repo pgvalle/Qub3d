@@ -5,7 +5,7 @@
 
 class Camera {
 private:
-  static const float MAX_ABS_PITCH = 89.99f;
+  static constexpr float MAX_ABS_PITCH = 89.99f;
 
   glm::vec3 position;
   glm::mat4 view;
