@@ -1,7 +1,9 @@
 #include "App.h"
 
 int main(int argc, char** argv) {
-  // this looks weird ik but i kinda like it lol
+  assert(glfwInit());
+  // this looks weird ik but hey it's kinda funny lol
   delete new App();
+  glfwTerminate();
   return 0;
 }

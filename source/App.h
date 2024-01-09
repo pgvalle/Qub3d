@@ -13,6 +13,7 @@
 #include "opengl/Opengl.h"
 
 class App {
+public:
   // low level
 
   GLFWwindow* window;
@@ -27,17 +28,19 @@ class App {
 
   // resources
   
-  TextureAtlas atlas;
+  //TextureAtlas atlas;
 
   // config ...
 
+  App();
+  ~App();
+
 private:
+  void centerWindow();
+
   void fixedUpdate();
   void update();
   void render();
 
   void mainLoop();
-
-public:
-  App();
 };
