@@ -17,7 +17,8 @@ set_target_properties(qub3d PROPERTIES
 
 target_include_directories(qub3d PRIVATE source/ external/)
 
-# GLFW setup
+
+message(STATUS "Setting up GLFW")
 
 include(FetchContent)
 
@@ -37,7 +38,8 @@ add_dependencies(qub3d glfw)
 target_include_directories(qub3d PRIVATE ${glfw3_INCLUDE_DIRS})
 target_link_libraries(qub3d PRIVATE glfw)
 
-# GLM setup
+
+message(STATUS "Setting up GLM")
 
 FetchContent_Declare(
   glm
