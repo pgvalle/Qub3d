@@ -97,13 +97,16 @@ void Shader::compileFromPaths(const char* vshPath, const char* fshPath) {
   delete[] vshSrc, fshSrc;
 }
 
+void Shader::use() const {
+  glUseProgram(id);
+}
 
-void Shader::uploadMat4(const char* name, const glm::mat4& mat) {
+void Shader::uploadMat4(const char* name, const glm::mat4& mat) const {
   const GLint location = glGetUniformLocation(id, name);
   glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]);
 }
 
-void Shader::uploadUInt(const char* name, GLuint value) {
+void Shader::uploadUInt(const char* name, GLuint value) const {
   const GLint location = glGetUniformLocation(id, name);
   glUniform1ui(location, value);
 }
