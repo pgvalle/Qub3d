@@ -1,4 +1,5 @@
 #include "Quad.h"
+
 #include <stdexcept>
 
 Quad::Quad() {}

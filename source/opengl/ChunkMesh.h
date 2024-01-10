@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glad.h>
+
 #include "world/Chunk.h"
 
 class ChunkMesh {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glad.h>
-#include <glm/mat4x4.hpp>
+#include <glm/glm.hpp>
 
 class Shader {
 private:

@@ -1,4 +1,5 @@
 #include "Chunk.h"
+
 #include <cstdio>
 
 int Chunk::toIndex(int x, int y, int z) const {

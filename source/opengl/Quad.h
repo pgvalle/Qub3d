@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Vertex.h"
+
 #include <initializer_list>
 
 struct Quad {

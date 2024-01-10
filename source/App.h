@@ -1,9 +1,7 @@
 #pragma once
 
-#include <cassert>
 #include <cstdio>
-#include <string>
-#include <map>
+#include <cassert>
 
 #include <glad.h>
 #include <GLFW/glfw3.h>
