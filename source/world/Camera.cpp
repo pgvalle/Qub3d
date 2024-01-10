@@ -1,15 +1,12 @@
-#include "camera.h"
-
+#include "Camera.h"
 #include <glm/gtc/matrix_transform.hpp>
-
-static const glm::vec3 UP = { 0, 1, 0 };
 
 Camera::Camera() {
   position = { 0, 0, 0 };
   yaw = 0;
   pitch = 0;
-  // setup view
-  rotate(0, 0);
+  // actual initialization of view, yaw and pitch
+  rotate(-90, 0);
 }
 
 const glm::mat4& Camera::getViewMatrix() const {
@@ -19,11 +16,13 @@ const glm::mat4& Camera::getViewMatrix() const {
 void Camera::rotate(float yawOff, float pitchOff) {
   yaw += glm::radians(yawOff);
   pitch -= glm::radians(pitchOff);
-  // direction and up can't be parallel. It would mess up the view matrix.
-  if (pitch >= MAX_ABS_PITCH) {
-    pitch = MAX_ABS_PITCH;
-  } else if (pitch <= -MAX_ABS_PITCH) {
-    pitch = -MAX_ABS_PITCH;
+
+  // If we don't do this the view matrix will get messed up
+  const float maxAbsPitchRad = glm::radians(MAX_ABS_PITCH);
+  if (pitch >= maxAbsPitchRad) {
+    pitch = maxAbsPitchRad;
+  } else if (pitch <= -maxAbsPitchRad) {
+    pitch = -maxAbsPitchRad;
   }
 
   const glm::vec3 direction = {
@@ -37,14 +36,11 @@ void Camera::rotate(float yawOff, float pitchOff) {
 void Camera::move(float xVel, float yVel, float zVel) {
   view = glm::translate(view, position);
 
-  // para a frente/tras relativo ao player
   const glm::vec3 front = { -view[0][2], 0, -view[2][2] };
   position += xVel * glm::normalize(front);
 
-  // para cima/baixo absoluto do mundo
   position += yVel * UP;
 
-  // para a direita/exquerda relativa do player
   const glm::vec3 right = { view[0][0], view[1][0], view[2][0] };
   position += zVel * right;
 

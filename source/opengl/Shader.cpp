@@ -1,8 +1,7 @@
-#include "shader.h"
+#include "Shader.h"
 
 #include <cstdio>
 #include <cstdlib>
-
 
 Shader::Shader() {
   id = 0;
@@ -16,7 +15,7 @@ Shader::~Shader() {
 
 
 void Shader::compile(const char* vshSrc, const char* fshSrc) {
-  if (id != 0) {
+  if (id) {
     printf("Shader info: Already compiled!\n");
     return;
   }
@@ -46,6 +45,7 @@ void Shader::compile(const char* vshSrc, const char* fshSrc) {
     exit(-1);
   }
 
+  id = glCreateProgram();
   glAttachShader(id, vsh);
   glAttachShader(id, fsh);
   glLinkProgram(id);

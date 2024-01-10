@@ -3,11 +3,12 @@
 
 #include <cstring>
 
-Keyboard::Keyboard(GLFWwindow* window) {
-  // initializing fields
+Keyboard::Keyboard() {
   memset(keys, 0, sizeof(keys));
   mods = 0;
+}
 
+void Keyboard::installCallbacks(GLFWwindow* window) {
   glfwSetKeyCallback(window, [](GLFWwindow* win, int key, int scan, int action, int mods) {
     Keyboard& k = ((App*)glfwGetWindowUserPointer(win))->keyboard;
     

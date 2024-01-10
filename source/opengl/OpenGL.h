@@ -2,5 +2,5 @@
 
 #include "Vertex.h"
 #include "Shader.h"
-#include "Camera.h"
-#include "TextureAtlas.h"
+#include "ChunkMesh.h"
+//#include "TextureAtlas.h"

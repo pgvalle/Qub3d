@@ -7,10 +7,11 @@
 
 #include <glad.h>
 #include <GLFW/glfw3.h>
-#include <glm/mat4x4.hpp>
+#include <glm/glm.hpp>
 
 #include "input/Input.h"
-#include "opengl/Opengl.h"
+#include "opengl/OpenGL.h"
+#include "world/World.h"
 
 class App {
 public:

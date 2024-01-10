@@ -7,8 +7,9 @@ private:
   int keys[350], mods;
 
 public:
-  Keyboard() {}
-  Keyboard(GLFWwindow* window);
+  Keyboard();
+
+  void installCallbacks(GLFWwindow* window);
 
   int getKey(int key);
 };

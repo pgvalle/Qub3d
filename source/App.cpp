@@ -1,22 +1,21 @@
 #include "App.h"
-
 #include <glm/gtc/matrix_transform.hpp>
 
 App::App() {
-  glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_TRUE);
+  // preconfiguring window
+  glfwDefaultWindowHints();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   window = glfwCreateWindow(800, 480, "Qub3d", NULL, NULL);
   assert(window);
-  centerWindow();
-
-  // so that i can access app data within the callback
-  glfwSetWindowUserPointer(window, this);
 
   glfwMakeContextCurrent(window);
   assert(gladLoadGL(glfwGetProcAddress));
+
+  // so that i can access app data within the callbacks
+  glfwSetWindowUserPointer(window, this);
 
   glfwSetFramebufferSizeCallback(window, [](GLFWwindow* win, int width, int height) {
     App& a = *((App*)glfwGetWindowUserPointer(win)); // quick alias. I do this in all callbacks
@@ -28,10 +27,13 @@ App::App() {
     glViewport(0, 0, width, height);
   });
 
-  keyboard = Keyboard(window);
-  mouse = Mouse(window);
+  glfwSwapInterval(1);
+  centerWindow();
 
-  shader.compileFromPaths("../assets/shaders/vert.glsl", "../assets/shaders/frag.glsl");
+  keyboard.installCallbacks(window);
+  mouse.installCallbacks(window);
+
+  shader.compileFromPaths("assets/shaders/vert.glsl", "assets/shaders/frag.glsl");
   shader.use();
 
   //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -41,6 +43,7 @@ App::App() {
   shader.uploadMat4("view", cam.getViewMatrix());
   shader.uploadMat4("proj", proj);
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
 
   mainLoop();
 }
@@ -114,8 +117,16 @@ void App::render() {
 }
 
 void App::mainLoop() {
+  Chunk chunk;
+  ChunkMesh mesh;
+  ChunkMesh::createQuadsSharedEBO();
+  mesh.build(chunk);
+
   while (!glfwWindowShouldClose(window)) {
-    render();
+    //render();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    mesh.render();
+    glfwSwapBuffers(window);
     update();
   }
 }

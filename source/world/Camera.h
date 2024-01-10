@@ -1,10 +1,10 @@
 #pragma once
 
-#include <glm/vec3.hpp>
-#include <glm/mat4x4.hpp>
+#include <glm/glm.hpp>
 
 class Camera {
 private:
+  static constexpr glm::vec3 UP = { 0, 1, 0 };
   static constexpr float MAX_ABS_PITCH = 89.99f;
 
   glm::vec3 position;

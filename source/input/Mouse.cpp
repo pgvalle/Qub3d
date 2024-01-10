@@ -3,18 +3,18 @@
 
 #include <cstring>
 
-Mouse::Mouse(GLFWwindow* window) {
-  // initializing fields
+
+Mouse::Mouse() {
   memset(buttons, 0, sizeof(buttons));
   mods = 0;
   x = 0;
   y = 0;
   lastX = 0;
   lastY = 0;
+}
 
-  // setting up callbacks
+void Mouse::installCallbacks(GLFWwindow* window) {
   glfwSetMouseButtonCallback(window, [](GLFWwindow* win, int button, int action, int mods) {
-    // creating mouse alias
     Mouse& m = ((App*)glfwGetWindowUserPointer(win))->mouse;
 
     m.buttons[button] = action;
@@ -22,7 +22,6 @@ Mouse::Mouse(GLFWwindow* window) {
   });
 
   glfwSetCursorPosCallback(window, [](GLFWwindow* win, double x, double y) {
-    // creating mouse alias
     Mouse& m = ((App*)glfwGetWindowUserPointer(win))->mouse;
 
     m.lastX = m.x;
@@ -31,9 +30,8 @@ Mouse::Mouse(GLFWwindow* window) {
     m.y = (int)y;
   });
 
-  // fix lastx and lasty update bug when cursor leaving then entering the window
+  // fix lastX and lastY bug when cursor leaving then entering the window
   glfwSetCursorEnterCallback(window, [](GLFWwindow* win, int entered) {
-    // creating mouse field alias
     Mouse& m = ((App*)glfwGetWindowUserPointer(win))->mouse;
 
     // get current cursor position

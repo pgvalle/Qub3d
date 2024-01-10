@@ -7,5 +7,5 @@ in vec2 uvs;
 out vec4 color;
 
 void main() {
-  color = texture(tex, uvs);
+  color = vec4(uvs, 1.0, 1.0);
 }

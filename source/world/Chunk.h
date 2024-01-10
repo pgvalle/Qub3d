@@ -1,28 +1,31 @@
 #pragma once
 
-#include <vector>
-#include <array>
+#include <glad.h>
 
-#include "./Block.h"
-#include "opengl/Quad.h"
+class Chunk {
+public:
+  static const int WIDTH  = 16,  // x
+                   HEIGHT = 256, // y
+                   DEPTH  = 16,  // z
+                   SIZE   = WIDTH * HEIGHT * DEPTH;
 
-#define CHUNK_WIDTH  16
-#define CHUNK_HEIGHT 16
-#define CHUNK_DEPTH  256
-#define CHUNK_SIZE   (CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH)
+public:
+  short blocks[SIZE];
 
-struct Chunk {
-  std::array<BlockID, CHUNK_SIZE> blocks;
-  // block states
-  // std::map<uint16_t, > states;
+  int toIndex(int x, int y, int z) const;
+  void toPosition(int i, int& x, int& y, int& z) const;
 
-  Chunk();
-};
+public:
+  Chunk() {
+    for (int i = 0; i < SIZE; i++) {
+      blocks[i] = 1;
+    }
+  }
 
-struct ChunkMesh {
-  std::vector<QuadVertices> vertices;
-  std::vector<QuadIndices> indices;
-  // tells where the mesh of a block starts and where it ends
-  // important for world editing later
-  std::array<uint16_t, CHUNK_SIZE + 1> block2quad;
+  bool hasLeftNeighbor(int i) const;
+  bool hasRightNeighbor(int i) const;
+  bool hasDownNeighbor(int i) const;
+  bool hasUpNeighbor(int i) const;
+  bool hasBackNeighbor(int i) const;
+  bool hasFrontNeighbor(int i) const;
 };

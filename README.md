@@ -1,3 +1,3 @@
-# Qub3d
+# Unblock3d
 
 Yet another minecraft clone

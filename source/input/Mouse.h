@@ -9,8 +9,9 @@ private:
   int lastX, lastY;
 
 public:
-  Mouse() {}
-  Mouse(GLFWwindow* window);
+  Mouse();
+
+  void installCallbacks(GLFWwindow* window);
 
   bool isMoving() const;
 
