@@ -18,7 +18,7 @@ void Camera::rotate(float yawOff, float pitchOff) {
   yaw += glm::radians(yawOff);
   pitch -= glm::radians(pitchOff);
 
-  // If we don't do this the view matrix will get messed up
+  // If we don't restrict pitch like this the view matrix will get messed up
   const float maxAbsPitchRad = glm::radians(MAX_ABS_PITCH);
   if (pitch >= maxAbsPitchRad) {
     pitch = maxAbsPitchRad;
