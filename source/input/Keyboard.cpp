@@ -1,8 +1,6 @@
 #include "App.h"
 #include "Keyboard.h"
 
-#include <cstring>
-
 Keyboard::Keyboard() {
   memset(keys, 0, sizeof(keys));
   mods = 0;

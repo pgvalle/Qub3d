@@ -1,9 +1,6 @@
 #include "App.h"
 #include "Mouse.h"
 
-#include <cstring>
-
-
 Mouse::Mouse() {
   memset(buttons, 0, sizeof(buttons));
   mods = 0;
