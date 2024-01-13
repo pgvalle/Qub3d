@@ -2,15 +2,17 @@
 
 #include "Vertex.h"
 
-#include <initializer_list>
-
 struct Quad {
-  // I can iterate over the vertices
-  // sizeof(Quad) = 4 * sizeof(Vertex)
+  enum class Location {
+    LEFT = 0, RIGHT,
+    DOWN, UP,
+    BACK, FRONT
+  };
+
   Vertex vertices[4];
 
-  Quad();
-  Quad(std::initializer_list<Vertex>&& vertices);
+  Quad(Location location);
 
+  // useful for ChunkMesh construction
   void translate(float x, float y, float z);
 };

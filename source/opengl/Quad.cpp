@@ -1,17 +1,43 @@
 #include "Quad.h"
 
-#include <stdexcept>
+#include <cstring>
 
-Quad::Quad() {}
+static const float QUADS[6][20] = {
+  // left
+  -0.5f, -0.5f, -0.5f,   0, 0,
+  -0.5f, -0.5f,  0.5f,   0, 0,
+  -0.5f,  0.5f,  0.5f,   0, 0,
+  -0.5f,  0.5f, -0.5f,   0, 0,
+  // right
+   0.5f, -0.5f,  0.5f,   0, 0,
+   0.5f, -0.5f, -0.5f,   0, 0,
+   0.5f,  0.5f, -0.5f,   0, 0,
+   0.5f,  0.5f,  0.5f,   0, 0,
+  // down
+  -0.5f, -0.5f, -0.5f,   0, 0,
+   0.5f, -0.5f, -0.5f,   0, 0,
+   0.5f, -0.5f,  0.5f,   0, 0,
+  -0.5f, -0.5f,  0.5f,   0, 0,
+  // up
+  -0.5f,  0.5f,  0.5f,   0, 0,
+   0.5f,  0.5f,  0.5f,   0, 0,
+   0.5f,  0.5f, -0.5f,   0, 0,
+  -0.5f,  0.5f, -0.5f,   0, 0,
+  // back
+   0.5f, -0.5f, -0.5f,   0, 0,
+  -0.5f, -0.5f, -0.5f,   0, 0,
+  -0.5f,  0.5f, -0.5f,   0, 0,
+   0.5f,  0.5f, -0.5f,   0, 0,
+  // front
+   0.5f, -0.5f,  0.5f,   0, 0,
+   0.5f,  0.5f,  0.5f,   0, 0,
+  -0.5f,  0.5f,  0.5f,   0, 0,
+  -0.5f, -0.5f,  0.5f,   0, 0
+};
 
-Quad::Quad(std::initializer_list<Vertex>&& verts) {
-  if (verts.size() > 4) {
-    throw std::out_of_range("initializer list must have size <= 4!");
-  }
-
-  for (int i = 0; i < 4; i++) {
-    vertices[i] = *(verts.begin() + i);
-  }
+Quad::Quad(Location location) {
+  const int i = (int)location;
+  memcpy(vertices, QUADS + i, sizeof(QUADS[i]));
 }
 
 void Quad::translate(float x, float y, float z) {
