@@ -6,13 +6,10 @@
 
 class ChunkMesh {
 private:
-  // The EBO is shared bc quads have the same element pattern:
-  // { n, n+1, n+2, n, n+2, n+3 }
-  static GLuint quadsEBOShared;
-
-  GLuint quadsVAO, quadsVBO;
+  GLuint quadsVAO;
 
 public:
+  // this won't work in another opengl context
   static void createQuadsSharedEBO();
   static void deleteQuadsSharedEBO();
 
