@@ -33,7 +33,7 @@ set(GLFW_BUILD_DOCS     OFF)
 FetchContent_MakeAvailable(glfw)
 
 add_dependencies(unblock3d glfw)
-target_include_directories(unblock3d PRIVATE ${glfw3_INCLUDE_DIRS})
+target_include_directories(unblock3d PRIVATE glfw)
 target_link_libraries(unblock3d PRIVATE glfw)
 
 
@@ -49,3 +49,7 @@ FetchContent_MakeAvailable(glm)
 add_dependencies(unblock3d glm)
 target_include_directories(unblock3d PRIVATE glm)
 target_link_libraries(unblock3d PRIVATE glm)
+
+target_precompile_headers(unblock3d PRIVATE
+  source/pch.h
+)
