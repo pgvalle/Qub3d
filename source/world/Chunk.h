@@ -1,11 +1,9 @@
 #pragma once
 
-#include <glad.h>
-
 class Chunk {
 public:
   static const int WIDTH  = 16,  // x
-                   HEIGHT = 256, // y
+                   HEIGHT = 16, // y
                    DEPTH  = 16,  // z
                    SIZE   = WIDTH * HEIGHT * DEPTH;
 
